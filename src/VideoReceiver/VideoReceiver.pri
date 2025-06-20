@@ -37,11 +37,11 @@ LinuxBuild {
     }
 } else:WindowsBuild {
     #- gstreamer installed by default under c:/gstreamer
-    GST_ROOT = c:/gstreamer/1.0/msvc_x86_64
+    GST_ROOT = e:\gstreamer\1.0\msvc_x86_64
 
     !exists($$GST_ROOT) {
         # In GitHub actions windows runner installation is on D drive, so try there as well
-        GST_ROOT = d:/gstreamer/1.0/msvc_x86_64
+        GST_ROOT = e:/gstreamer/1.0/msvc_x86_64
     }
 
     exists($$GST_ROOT) {

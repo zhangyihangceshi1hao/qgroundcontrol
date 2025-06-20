@@ -55,7 +55,11 @@ WindowsBuild {
     RC_ICONS = resources/icons/qgroundcontrol.ico
     CONFIG += resources_big
 }
-
+# 针对MSVC编译器添加UTF-8编译选项
+win32:msvc {
+    QMAKE_CXXFLAGS += /utf-8
+    QMAKE_CFLAGS   += /utf-8
+}
 #
 # Branding
 #
