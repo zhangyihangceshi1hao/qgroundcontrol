@@ -1,4 +1,4 @@
-/****************************************************************************
+﻿/****************************************************************************
  *
  * (c) 2009-2020 QGROUNDCONTROL PROJECT <http://www.qgroundcontrol.org>
  *
@@ -720,6 +720,291 @@ ApplicationWindow {
             onClosing: {
                 visible = false
                 source = ""
+            }
+        }
+    }
+
+    // ################# 视频工具 #################
+    function controlVideoTool() {
+        if(videoToolLoader.visible) {
+            videoToolLoader.visible = false
+            videoToolLoader.sourceComponent = undefined
+        } else {
+            videoToolLoader.visible = true
+            videoToolLoader.sourceComponent = videoToolComponent
+        }
+    }
+    Loader {
+        id: videoToolLoader
+        visible: false
+        anchors.centerIn: parent
+    }
+
+    // 调试工具窗口
+    Component {
+        id: videoToolComponent
+
+        Rectangle {
+            color:                              "#505057"
+            height:                             _viewColumn.height
+            width:                              ScreenTools.defaultFontPixelWidth * 45  // 窗口宽度
+            anchors.centerIn:                   parent
+            border.color:                       "#555555"
+            radius:                             ScreenTools.defaultFontPixelWidth * 0.5
+
+            readonly property real _margin:             ScreenTools.defaultFontPixelWidth
+            readonly property real _buttonHeight:       ScreenTools.defaultFontPixelHeight * 2
+            readonly property real _buttonWidth:        ScreenTools.defaultFontPixelWidth * 6
+
+            property var           _appSettings:        QGroundControl.settingsManager.appSettings
+            property var           _videoSettings:      QGroundControl.settingsManager.videoSettings
+
+            readonly property int onlyOneState:   0
+            readonly property int twoVideoState:  1
+            readonly property int fourVideoState: 2
+            property int viewState: QGroundControl.settingsManager.appSettings.videoViewType.value
+
+            Column {
+                id: _viewColumn
+                width: parent.width
+                anchors.centerIn: parent
+
+                //< 标题
+                Rectangle {
+                    id:                         headItem
+                    height:                     ScreenTools.defaultFontPixelHeight * 2
+                    width:                      parent.width
+                    anchors.horizontalCenter:   parent.horizontalCenter
+                    color:                      "#222222"
+                    clip:                       true
+                    radius:                     ScreenTools.defaultFontPixelWidth * 0.5
+
+                    QGCLabel {
+                        id:                     titleLabel
+                        text:                   qsTr("视频工具")
+                        color:                  "white"
+                        font.bold:              true
+                        anchors.centerIn:       parent
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
+
+                    Item {
+                        width:                  parent.height
+                        height:                 width
+                        anchors.right:          parent.right
+
+                        QGCColoredImage {
+                                height:                     parent.height * 0.4
+                                width:                      height
+                                sourceSize.height:          height
+                                source:                     "/res/XDelete.svg"
+                                color:                      "white"
+                                anchors.centerIn:           parent
+                            }
+
+                        MouseArea {
+                            anchors.fill:           parent
+                            onClicked: {
+                                controlVideoTool()
+                            }
+                        }
+                    }
+                }
+
+                //< 内容区域
+                Item {
+                    height:                     _contentColumn.height
+                    width:                      parent.width - _margin * 2
+                    anchors.horizontalCenter:   parent.horizontalCenter
+                    Component.onCompleted: {
+                        _video01_Url_TextField.text = _videoSettings.rtspUrl.value
+                        _video02_Url_TextField.text = _videoSettings.rtspUrl02.value
+                        _video03_Url_TextField.text = _videoSettings.rtspUrl03.value
+                        _video04_Url_TextField.text = _videoSettings.rtspUrl04.value
+                    }
+
+                    Column {
+                        id: _contentColumn
+                        spacing: _margin
+                        width:  parent.width
+
+                        // 间距
+                        Item { height: 1;  width: 1 }
+
+                        QGCComboBox {
+                            id:                         videoCombo
+                            width:                      parent.width
+                            anchors.horizontalCenter:   parent.horizontalCenter
+                            model:                      [ qsTr("单路视频窗口"), qsTr("双路视频窗口"),qsTr("四路视频窗口")]
+                            currentIndex:               viewState
+                            onActivated: {
+                                // 窗口类型
+                                _appSettings.videoViewType.value = currentIndex
+                            }
+                        }
+
+                        Item { height: 1;  width: 1 }
+
+                        Row {
+                            height:                     _buttonHeight
+                            width:                      parent.width
+                            spacing:                    _margin
+
+                            Rectangle {
+                                height: parent.height * 0.8
+                                width: height
+                                radius: height /2
+                                color: "#ff8800"
+                                anchors.verticalCenter: parent.verticalCenter
+                                border.color: "#dcdcdc"
+
+                                QGCLabel {
+                                    text: "1"
+                                    color: "white"
+                                    font.bold: true
+                                    anchors.centerIn: parent
+                                }
+                            }
+
+                            QGCTextField {
+                                id:                     _video01_Url_TextField
+                                width:                  parent.width - parent.height * 0.8 - _buttonWidth - parent.spacing * 2
+                                height:                 parent.height
+                            }
+
+                            QGCButton {
+                                text:                   "保存"
+                                width:                  _buttonWidth
+                                anchors.verticalCenter: parent.verticalCenter
+                                height:                 parent.height
+                                onClicked: {
+                                    focus = true
+                                    _videoSettings.rtspUrl.value      = _video01_Url_TextField.text
+                                }
+                            }
+                        }
+
+                        Row {
+                            height:                     _buttonHeight
+                            width:                      parent.width
+                            spacing:                    _margin
+
+                            Rectangle {
+                                height: parent.height * 0.8
+                                width: height
+                                radius: height /2
+                                color: "#ff8800"
+                                border.color: "#dcdcdc"
+                                anchors.verticalCenter: parent.verticalCenter
+
+                                QGCLabel {
+                                    text: "2"
+                                    color: "white"
+                                    font.bold: true
+                                    anchors.centerIn: parent
+                                }
+                            }
+
+                            QGCTextField {
+                                id:                     _video02_Url_TextField
+                                width:                  parent.width - parent.height * 0.8 - _buttonWidth - parent.spacing * 2
+                                height:                 parent.height
+                            }
+
+                            QGCButton {
+                                text:                   "保存"
+                                width:                  _buttonWidth
+                                anchors.verticalCenter: parent.verticalCenter
+                                height:                 parent.height
+                                onClicked: {
+                                    focus = true
+                                    _videoSettings.rtspUrl02.value      = _video02_Url_TextField.text
+                                }
+                            }
+                        }
+
+                        Row {
+                            height:                     _buttonHeight
+                            width:                      parent.width
+                            spacing:                    _margin
+
+                            Rectangle {
+                                height: parent.height * 0.8
+                                width: height
+                                radius: height /2
+                                color: "#ff8800"
+                                border.color: "#dcdcdc"
+                                anchors.verticalCenter: parent.verticalCenter
+
+                                QGCLabel {
+                                    text: "3"
+                                    color: "white"
+                                    font.bold: true
+                                    anchors.centerIn: parent
+                                }
+                            }
+
+                            QGCTextField {
+                                id:                     _video03_Url_TextField
+                                width:                  parent.width - parent.height * 0.8 - _buttonWidth - parent.spacing * 2
+                                height:                 parent.height
+                            }
+
+                            QGCButton {
+                                text:                   "保存"
+                                width:                  _buttonWidth
+                                anchors.verticalCenter: parent.verticalCenter
+                                height:                 parent.height
+                                onClicked: {
+                                    focus = true
+                                    _videoSettings.rtspUrl03.value      = _video03_Url_TextField.text
+                                }
+                            }
+                        }
+
+                        Row {
+                            height:                     _buttonHeight
+                            width:                      parent.width
+                            spacing:                    _margin
+
+                            Rectangle {
+                                height: parent.height * 0.8
+                                width: height
+                                radius: height /2
+                                color: "#ff8800"
+                                border.color: "#dcdcdc"
+                                anchors.verticalCenter: parent.verticalCenter
+
+                                QGCLabel {
+                                    text: "4"
+                                    color: "white"
+                                    font.bold: true
+                                    anchors.centerIn: parent
+                                }
+                            }
+
+                            QGCTextField {
+                                id:                     _video04_Url_TextField
+                                width:                  parent.width - parent.height * 0.8 - _buttonWidth - parent.spacing * 2
+                                height:                 parent.height
+                            }
+
+                            QGCButton {
+                                text:                   "保存"
+                                width:                  _buttonWidth
+                                anchors.verticalCenter: parent.verticalCenter
+                                height:                 parent.height
+                                onClicked: {
+                                    focus = true
+                                    _videoSettings.rtspUrl04.value      = _video04_Url_TextField.text
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // 间距
+                Item { height: _margin;  width: 1 }
             }
         }
     }

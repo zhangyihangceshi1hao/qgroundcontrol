@@ -1,4 +1,4 @@
-/****************************************************************************
+﻿/****************************************************************************
  *
  * (c) 2009-2020 QGROUNDCONTROL PROJECT <http://www.qgroundcontrol.org>
  *
@@ -131,7 +131,8 @@ DECLARE_SETTINGGROUP(App, "")
 
     _checkSavePathDirectories();
 }
-
+// 新增自定义变量
+DECLARE_SETTINGSFACT(AppSettings, videoViewType)
 DECLARE_SETTINGSFACT(AppSettings, offlineEditingFirmwareClass)
 DECLARE_SETTINGSFACT(AppSettings, offlineEditingVehicleClass)
 DECLARE_SETTINGSFACT(AppSettings, offlineEditingCruiseSpeed)

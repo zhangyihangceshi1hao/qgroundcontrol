@@ -1,4 +1,4 @@
-/****************************************************************************
+﻿/****************************************************************************
  *
  * (c) 2009-2020 QGROUNDCONTROL PROJECT <http://www.qgroundcontrol.org>
  *
@@ -66,7 +66,7 @@ VideoManager::VideoManager(QGCApplication* app, QGCToolbox* toolbox)
 //-----------------------------------------------------------------------------
 VideoManager::~VideoManager()
 {
-    for (int i = 0; i < 2; i++) {
+    for (int i = 0; i < videoCounts; i++) {
         if (_videoReceiver[i] != nullptr) {
             delete _videoReceiver[i];
             _videoReceiver[i] = nullptr;
@@ -99,6 +99,13 @@ VideoManager::setToolbox(QGCToolbox *toolbox)
    connect(_videoSettings->videoSource(),   &Fact::rawValueChanged, this, &VideoManager::_videoSourceChanged);
    connect(_videoSettings->udpPort(),       &Fact::rawValueChanged, this, &VideoManager::_udpPortChanged);
    connect(_videoSettings->rtspUrl(),       &Fact::rawValueChanged, this, &VideoManager::_rtspUrlChanged);
+   /*
+    * 新增多路图传模块
+    * 多路图传Rtsp Url变化
+    */
+   connect(_videoSettings->rtspUrl02(),       &Fact::rawValueChanged, this, &VideoManager::_rtspUrl02Changed);
+   connect(_videoSettings->rtspUrl03(),       &Fact::rawValueChanged, this, &VideoManager::_rtspUrl03Changed);
+   connect(_videoSettings->rtspUrl04(),       &Fact::rawValueChanged, this, &VideoManager::_rtspUrl04Changed);
    connect(_videoSettings->tcpUrl(),        &Fact::rawValueChanged, this, &VideoManager::_tcpUrlChanged);
    connect(_videoSettings->aspectRatio(),   &Fact::rawValueChanged, this, &VideoManager::_aspectRatioChanged);
    connect(_videoSettings->lowLatencyMode(),&Fact::rawValueChanged, this, &VideoManager::_lowLatencyModeChanged);
@@ -115,9 +122,19 @@ VideoManager::setToolbox(QGCToolbox *toolbox)
     emit isGStreamerChanged();
     qCDebug(VideoManagerLog) << "New Video Source:" << videoSource;
 #if defined(QGC_GST_STREAMING)
-    _videoReceiver[0] = toolbox->corePlugin()->createVideoReceiver(this);
-    _videoReceiver[1] = toolbox->corePlugin()->createVideoReceiver(this);
+    // _videoReceiver[0] = toolbox->corePlugin()->createVideoReceiver(this);
+    // _videoReceiver[1] = toolbox->corePlugin()->createVideoReceiver(this);
 
+    /*
+     * 新增多路图传模块
+     */
+    for (int i = 0; i < videoCounts; i++) {
+        // _videoReceiver 负责接收视频流并与 GStreamer 管线对接​
+        _videoReceiver[i] = toolbox->corePlugin()->createVideoReceiver(this);
+    }
+
+    // ---------------------------------------------------------------
+    // 第1路图传
     connect(_videoReceiver[0], &VideoReceiver::streamingChanged, this, [this](bool active){
         _streaming = active;
         emit streamingChanged();
@@ -186,6 +203,7 @@ VideoManager::setToolbox(QGCToolbox *toolbox)
 
     // FIXME: AV: I believe _thermalVideoReceiver should be handled just like _videoReceiver in terms of event
     // and I expect that it will be changed during multiple video stream activity
+    /*
     if (_videoReceiver[1] != nullptr) {
         connect(_videoReceiver[1], &VideoReceiver::onStartComplete, this, [this](VideoReceiver::STATUS status) {
             if (status == VideoReceiver::STATUS_OK) {
@@ -207,18 +225,51 @@ VideoManager::setToolbox(QGCToolbox *toolbox)
             _startReceiver(1);
         });
     }
+*/
 #endif
+    /*
     _updateSettings(0);
     _updateSettings(1);
-    if(isGStreamer()) {
-        startVideo();
-    } else {
-        stopVideo();
+*/
+
+    // ############ 新增多路图传信号槽绑定 #################
+    // 除了第一路外，其余三路通过 _bindSecondaryStream 统一绑定信号
+    for (int i = 1; i < videoCounts; ++i) {
+        if (_videoReceiver[i]) {
+            _bindSecondaryStream(_videoReceiver[i], i);
+        }
     }
+
+    // 启动所有图传
+    startVideo();
 
 #endif
 }
+void VideoManager::_bindSecondaryStream(VideoReceiver* receiver, int index)
+{
+    connect(receiver, &VideoReceiver::onStartComplete, this, [=](VideoReceiver::STATUS status) {
+        if (status == VideoReceiver::STATUS_OK) {
+            _videoStarted[index] = true;
+            if (_videoSink[index]) {
+                receiver->startDecoding(_videoSink[index]);
+            }
+        } else if (status != VideoReceiver::STATUS_INVALID_URL &&
+                   status != VideoReceiver::STATUS_INVALID_STATE) {
+            _restartVideo(index);
+        }
+    });
 
+    connect(receiver, &VideoReceiver::onStopComplete, this, [=](VideoReceiver::STATUS status) {
+        _videoStarted[index] = false;
+        // 避免了无效 URL 时的重复重启
+        if (status == VideoReceiver::STATUS_INVALID_URL) {
+            qDebug() << QString("[Video %1] Invalid URL. Not restarting.").arg(index + 1);
+        } else {
+            qDebug() << "[_startReceiver] 启动 Video" << (index + 1);
+            _startReceiver(index);
+        }
+    });
+}
 void VideoManager::_cleanupOldVideos()
 {
 #if defined(QGC_GST_STREAMING)
@@ -268,13 +319,32 @@ VideoManager::startVideo()
         return;
     }
 
-    if(!_videoSettings->streamEnabled()->rawValue().toBool() || !_videoSettings->streamConfigured()) {
+    // 屏蔽官网代码
+    /*
+     * 注意：第一路图传url为空时，streamConfigured() 为false，所以需要屏蔽此判断
+     */
+    //if(!_videoSettings->streamEnabled()->rawValue().toBool() || !_videoSettings->streamConfigured()) {
+
+    if(!_videoSettings->streamEnabled()->rawValue().toBool()) {
         qCDebug(VideoManagerLog) << "Stream not enabled/configured";
         return;
     }
 
+    /*
     _startReceiver(0);
     _startReceiver(1);
+    */
+
+    // 使用延时方式错开发起多路拉流，避免同时发起影响性能
+    int delay = 0;
+    for (int i = 0; i < videoCounts; i++) {
+        if (_videoReceiver[i]) {
+            QTimer::singleShot(delay, this, [this, i]() {
+                _startReceiver(i);  // 启动第 i 路图传
+            });
+            delay += 200; // 每一路延迟200ms
+        }
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -285,8 +355,17 @@ VideoManager::stopVideo()
         return;
     }
 
+    // 停止所有视频流
+    for (int i = 0; i < videoCounts; i++) {
+        if (_videoReceiver[i]) {
+            _stopReceiver(i);
+        }
+    }
+
+    /*
     _stopReceiver(1);
     _stopReceiver(0);
+    */
 }
 
 void
@@ -328,9 +407,11 @@ VideoManager::startRecording(const QString& videoFile)
     if (_videoReceiver[0] && _videoStarted[0]) {
         _videoReceiver[0]->startRecording(_videoFile, fileFormat);
     }
+    /*
     if (_videoReceiver[1] && _videoStarted[1]) {
         _videoReceiver[1]->startRecording(videoFile2, fileFormat);
     }
+*/
 
 #else
     Q_UNUSED(videoFile)
@@ -345,7 +426,7 @@ VideoManager::stopRecording()
     }
 #if defined(QGC_GST_STREAMING)
 
-    for (int i = 0; i < 2; i++) {
+    for (int i = 0; i < 1; i++) {
         if (_videoReceiver[i]) {
             _videoReceiver[i]->stopRecording();
         }
@@ -500,13 +581,24 @@ void
 VideoManager::_videoSourceChanged()
 {
     _updateUVC();
-    _updateSettings(0);
+
+    /* 更新所有 RTSP Url */
+    for (int i = 0; i < videoCounts; i++) {
+        if (_videoReceiver[i]) {
+            _updateSettings(i);
+        }
+    }
+
     emit hasVideoChanged();
     emit isGStreamerChanged();
-    emit isUvcChanged();
     emit isAutoStreamChanged();
+
+    //_restartVideo(0);
+
     if (hasVideo()) {
-        _restartVideo(0);
+        //_restartVideo(0);
+        /* 重新拉取所有视频流 */
+        _restartAllVideos();
     } else {
         stopVideo();
     }
@@ -525,7 +617,22 @@ VideoManager::_rtspUrlChanged()
 {
     _restartVideo(0);
 }
+void
+VideoManager::_rtspUrl02Changed()
+{
+    _restartVideo(1);
+}
 
+void
+VideoManager::_rtspUrl03Changed()
+{
+    _restartVideo(2);
+}
+
+void VideoManager::_rtspUrl04Changed()
+{
+    _restartVideo(3);
+}
 //-----------------------------------------------------------------------------
 void
 VideoManager::_tcpUrlChanged()
@@ -620,13 +727,15 @@ VideoManager::_initVideo()
         return;
     }
 
+    // 分别绑定4个 QML 图像组件（通过 objectName）
+    // ****************** 第1路图传 **********************
     QQuickItem* widget = root->findChild<QQuickItem*>("videoContent");
 
     if (widget != nullptr && _videoReceiver[0] != nullptr) {
         _videoSink[0] = qgcApp()->toolbox()->corePlugin()->createVideoSink(this, widget);
         if (_videoSink[0] != nullptr) {
             if (_videoStarted[0]) {
-                _videoReceiver[0]->startDecoding(_videoSink[0]);
+                _videoReceiver[0]->startDecoding(_videoSink[0]);  // 开始解码推送至Qml控件
             }
         } else {
             qCDebug(VideoManagerLog) << "createVideoSink() failed";
@@ -635,19 +744,16 @@ VideoManager::_initVideo()
         qCDebug(VideoManagerLog) << "video receiver disabled";
     }
 
-    widget = root->findChild<QQuickItem*>("thermalVideo");
-
-    if (widget != nullptr && _videoReceiver[1] != nullptr) {
-        _videoSink[1] = qgcApp()->toolbox()->corePlugin()->createVideoSink(this, widget);
-        if (_videoSink[1] != nullptr) {
-            if (_videoStarted[1]) {
-                _videoReceiver[1]->startDecoding(_videoSink[1]);
+    // ****************** 其他三路图传处理 **********************
+    const char* sinkNames[] = { "videoContent", "thermalVideo", "thirdVideo", "fourthVideo" };
+    for (int i = 0; i < videoCounts; ++i) {
+        QQuickItem* widget = root->findChild<QQuickItem*>(sinkNames[i]);
+        if (widget && _videoReceiver[i]) {
+            _videoSink[i] = qgcApp()->toolbox()->corePlugin()->createVideoSink(this, widget);
+            if (_videoSink[i] && _videoStarted[i]) {
+                _videoReceiver[i]->startDecoding(_videoSink[i]);
             }
-        } else {
-            qCDebug(VideoManagerLog) << "createVideoSink() failed";
         }
-    } else {
-        qCDebug(VideoManagerLog) << "thermal video receiver disabled";
     }
 #endif
 }
@@ -756,7 +862,13 @@ VideoManager::_updateSettings(unsigned id)
                 << "Video source URI \"" << source << "\" is not supported. Please add support!";
         }
     }
-
+    /* 新增多路图传 Url 更新 */
+    if (id == 1)
+        settingsChanged |= _updateVideoUri(1, _videoSettings->rtspUrl02()->rawValue().toString());
+    else if (id == 2)
+        settingsChanged |= _updateVideoUri(2, _videoSettings->rtspUrl03()->rawValue().toString());
+    else if (id == 3)
+        settingsChanged |= _updateVideoUri(3, _videoSettings->rtspUrl04()->rawValue().toString());
     return settingsChanged;
 }
 
@@ -837,19 +949,23 @@ void
 VideoManager::_startReceiver(unsigned id)
 {
 #if defined(QGC_GST_STREAMING)
-    const QString source = _videoSettings->videoSource()->rawValue().toString();
-    const unsigned rtsptimeout = _videoSettings->rtspTimeout()->rawValue().toUInt();
-    /* The gstreamer rtsp source will switch to tcp if udp is not available after 5 seconds.
-       So we should allow for some negotiation time for rtsp */
-    const unsigned timeout = (source == VideoSettings::videoSourceRTSP ? rtsptimeout : 2 );
+    const unsigned timeout = _videoSettings->rtspTimeout()->rawValue().toUInt();
 
-    if (id > 1) {
-        qCDebug(VideoManagerLog) << "Unsupported receiver id" << id;
-    } else if (_videoReceiver[id] != nullptr/* && _videoSink[id] != nullptr*/) {
+    //    if (id > 1) {
+    //        qCDebug(VideoManagerLog) << "Unsupported receiver id" << id;
+    //    }
+    //    else if (_videoReceiver[id] != nullptr/* && _videoSink[id] != nullptr*/) {
+    //        if (!_videoUri[id].isEmpty()) {
+    //            _videoReceiver[id]->start(_videoUri[id], timeout, _lowLatencyStreaming[id] ? -1 : 0);
+    //        }
+    //    }
+
+    if (_videoReceiver[id] != nullptr/* && _videoSink[id] != nullptr*/) {
         if (!_videoUri[id].isEmpty()) {
             _videoReceiver[id]->start(_videoUri[id], timeout, _lowLatencyStreaming[id] ? -1 : 0);
         }
     }
+
 #else
     Q_UNUSED(id);
 #endif

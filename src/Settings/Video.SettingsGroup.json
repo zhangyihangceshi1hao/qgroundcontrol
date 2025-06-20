@@ -1,4 +1,4 @@
-{
+﻿{
     "version":      1,
     "fileType":  "FactMetaData",
     "QGC.MetaData.Facts":
@@ -20,6 +20,27 @@
 },
 {
     "name":             "rtspUrl",
+    "shortDesc": "Video RTSP Url",
+    "longDesc":  "RTSP url address and port to bind to for video stream. Example: rtsp://192.168.42.1:554/live",
+    "type":             "string",
+    "default":     ""
+},
+{
+    "name":             "rtspUrl02",
+    "shortDesc": "Video RTSP Url",
+    "longDesc":  "RTSP url address and port to bind to for video stream. Example: rtsp://192.168.42.1:554/live",
+    "type":             "string",
+    "default":     ""
+},
+{
+    "name":             "rtspUrl03",
+    "shortDesc": "Video RTSP Url",
+    "longDesc":  "RTSP url address and port to bind to for video stream. Example: rtsp://192.168.42.1:554/live",
+    "type":             "string",
+    "default":     ""
+},
+{
+    "name":             "rtspUrl04",
     "shortDesc": "Video RTSP Url",
     "longDesc":  "RTSP url address and port to bind to for video stream. Example: rtsp://192.168.42.1:554/live",
     "type":             "string",

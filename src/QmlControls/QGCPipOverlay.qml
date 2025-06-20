@@ -1,4 +1,4 @@
-/****************************************************************************
+﻿/****************************************************************************
  *
  * (c) 2009-2020 QGROUNDCONTROL PROJECT <http://www.qgroundcontrol.org>
  *
@@ -247,6 +247,31 @@ Item {
         MouseArea {
             anchors.fill:   parent
             onClicked:      _root._setPipIsExpanded(true)
+        }
+    }
+    // ************************ 设置按钮 ************************
+    Item {
+        height:                 ScreenTools.defaultFontPixelHeight * 2.5
+        width:                  height
+        anchors.bottom:         parent.bottom
+        anchors.right:          parent.right
+        visible:                pipMouseArea.containsMouse && _isExpanded
+
+        QGCColoredImage {
+            height:             parent.height * 0.6
+            width:              height
+            anchors.centerIn:   parent
+            source:             "/res/gear-black.svg"
+            fillMode:           Image.PreserveAspectFit
+            sourceSize.height:  height
+            color:              "#aaffffff"
+        }
+
+        MouseArea {
+            anchors.fill:   parent
+            onClicked:  {
+                mainWindow.controlVideoTool()
+            }
         }
     }
 }

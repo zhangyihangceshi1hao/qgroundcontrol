@@ -1,4 +1,4 @@
-/****************************************************************************
+﻿/****************************************************************************
  *
  * (c) 2009-2020 QGROUNDCONTROL PROJECT <http://www.qgroundcontrol.org>
  *
@@ -13,10 +13,228 @@ import QGroundControl               1.0
 import QGroundControl.Controls      1.0
 import QGroundControl.Controllers   1.0
 import QGroundControl.ScreenTools   1.0
+import QGroundControl.FlightMap 1.0
 
 Item {
     id:         _root
     visible:    QGroundControl.videoManager.hasVideo
+
+
+    property color _bgColor: "#333333"
+    property real rootWidth: _root.width
+    property real rootHeight: _root.height
+
+    // 窗口数量类型（单路、双路、四路）
+    property int onlyOneState:   0
+    property int twoVideoState:  1
+    property int fourVideoState: 2
+    property int videoViewState: QGroundControl.settingsManager.appSettings.videoViewType.value
+    onVideoViewStateChanged: {
+        _firstWindow.updateAnchors()
+        _secondWindow.updateAnchors()
+        _thirdWindow.updateAnchors()
+        _fourthWindow.updateAnchors()
+    }
+    function getWindowSize(windowId, dimension) {
+        // 仅在4路模式下第三、第四窗口有宽高度
+        if((windowId === 3 || windowId === 4) && videoViewState != fourVideoState) {
+            _thirdWindow.visible = false
+            _fourthWindow.visible = false
+            _secondWindow.visible = true
+            return 0
+        }
+        // 单路
+        if (videoViewState === onlyOneState ) {
+            if (windowId === 1) {
+                return dimension === "height" ? rootHeight : rootWidth;
+            }
+            _secondWindow.visible = false
+            _thirdWindow.visible = false
+            _fourthWindow.visible = false
+            return 0;
+        }
+        // 双路
+        else if (videoViewState === twoVideoState) {
+            return dimension === "height" ? rootHeight : rootWidth / 2;
+        }
+        // 四路
+        else if (videoViewState === fourVideoState) {
+            _secondWindow.visible = true
+            _thirdWindow.visible = true
+            _fourthWindow.visible = true
+            return dimension === "height" ? rootHeight / 2 : rootWidth / 2;
+        }
+    }
+
+    // ----------------------------------------------------------------
+    // （主）第一路视频框
+    Rectangle {
+        id: _firstWindow
+        height: getWindowSize(1, "height")
+        width: getWindowSize(1, "width")
+        color: _bgColor
+        border.color: "black"
+        anchors.top: parent.top
+        anchors.left: parent.left
+        z: _secondWindow.z + 1
+
+        function updateAnchors() {
+            if (videoViewState === onlyOneState) {
+                anchors.top = parent.top;
+                anchors.left = parent.left;
+            } else if (videoViewState === twoVideoState) {
+                anchors.top = parent.top;
+                anchors.left = parent.left;
+            } else if (videoViewState === fourVideoState) {
+                anchors.top = parent.top;
+                anchors.left = parent.left;
+            }
+        }
+        Component.onCompleted: updateAnchors()
+
+        QGCLabel {
+            text:               "Waiting..."
+            font.family:        ScreenTools.demiboldFontFamily
+            color:              "white"
+            font.pointSize:     ScreenTools.smallFontPointSize
+            anchors.centerIn:   parent
+        }
+
+        //-- Video Streaming
+        FlightDisplayViewVideo {
+            id:             videoStreaming
+            anchors.fill:   parent
+            useSmallFont:   _root.pipState.state !== _root.pipState.fullState
+            visible:        QGroundControl.videoManager.isGStreamer
+        }
+        /*
+        //-- UVC Video (USB Camera or Video Device)
+        Loader {
+            id:             cameraLoader
+            anchors.fill:   parent
+            visible:        !QGroundControl.videoManager.isGStreamer
+            source:         QGroundControl.videoManager.uvcEnabled ? "qrc:/qml/FlightDisplayViewUVC.qml" : "qrc:/qml/FlightDisplayViewDummy.qml"
+        }
+        */
+    }
+
+    // ----------------------------------------------------------------
+    // 第二路视频框
+    Rectangle {
+        id: _secondWindow
+        height: getWindowSize(2, "height")
+        width: getWindowSize(2, "width")
+        color: _bgColor
+        border.color: "black"
+        anchors.top: parent.top
+        anchors.left: parent.horizontalCenter
+
+        function updateAnchors() {
+            if (videoViewState === onlyOneState) {
+                anchors.top = parent.top;
+                anchors.left = parent.left;
+            } else if (videoViewState === twoVideoState) {
+                anchors.top = parent.top;
+                anchors.left = _firstWindow.right;
+            } else if (videoViewState === fourVideoState) {
+                anchors.top = parent.top;
+                anchors.left = parent.horizontalCenter;
+            }
+        }
+
+        Component.onCompleted: updateAnchors()
+
+        QGCLabel {
+            text:               "Waiting..."
+            font.family:        ScreenTools.demiboldFontFamily
+            color:              "white"
+            font.pointSize:     ScreenTools.smallFontPointSize
+            anchors.centerIn:   parent
+        }
+
+        // 第2个视频窗口
+        QGCVideoBackground {
+            id:             thermalVideo
+            objectName:     "thermalVideo"
+            anchors.fill:   parent
+            receiver:       QGroundControl.videoManager.thermalVideoReceiver
+        }
+    }
+
+    // ----------------------------------------------------------------
+    // 第三路视频框
+    Rectangle {
+        id: _thirdWindow
+        height: getWindowSize(3, "height")
+        width: getWindowSize(3, "width")
+        color: _bgColor
+        border.color: "black"
+        anchors.bottom: parent.bottom
+        anchors.left: parent.left
+
+        function updateAnchors() {
+            if (videoViewState === fourVideoState) {
+                anchors.bottom = parent.bottom;
+                anchors.left = parent.left;
+            }
+        }
+        Component.onCompleted: updateAnchors()
+
+        QGCLabel {
+            text:               "Waiting..."
+            font.family:        ScreenTools.demiboldFontFamily
+            color:              "white"
+            font.pointSize:     ScreenTools.smallFontPointSize
+            anchors.centerIn:   parent
+        }
+
+        // 第3个视频窗口
+        QGCVideoBackground {
+            id:             thirdVideo
+            objectName:     "thirdVideo"
+            anchors.fill:   parent
+            receiver:       QGroundControl.videoManager.thirdVideoReceiver
+        }
+    }
+
+    // ----------------------------------------------------------------
+    // 第四路视频框
+    Rectangle {
+        id: _fourthWindow
+        height: getWindowSize(4, "height")
+        width: getWindowSize(4, "width")
+        color: _bgColor
+        border.color: "black"
+        anchors.bottom: parent.bottom
+        anchors.right: parent.right
+        function updateAnchors() {
+            if (videoViewState === fourVideoState) {
+                anchors.bottom = parent.bottom
+                anchors.right = parent.right;
+            }
+        }
+
+        Component.onCompleted: updateAnchors()
+
+        QGCLabel {
+            text:               "Waiting..."
+            font.family:        ScreenTools.demiboldFontFamily
+            color:              "white"
+            font.pointSize:     ScreenTools.smallFontPointSize
+            anchors.centerIn:   parent
+        }
+
+        // 第4个视频窗口
+        QGCVideoBackground {
+            id:             fourthVideo
+            objectName:     "fourthVideo"
+            anchors.fill:   parent
+            receiver:       QGroundControl.videoManager.thirdVideoReceiver
+        }
+    }
+
+    // ====================================================================
+
 
     property int    _track_rec_x:       0
     property int    _track_rec_y:       0
@@ -51,7 +269,7 @@ Item {
         repeat:       false
         onTriggered:  QGroundControl.videoManager.startVideo()
     }
-
+/*
     //-- Video Streaming
     FlightDisplayViewVideo {
         id:             videoStreaming
@@ -59,6 +277,7 @@ Item {
         useSmallFont:   _root.pipState.state !== _root.pipState.fullState
         visible:        QGroundControl.videoManager.isGStreamer
     }
+*/
     //-- UVC Video (USB Camera or Video Device)
     Loader {
         id:             cameraLoader

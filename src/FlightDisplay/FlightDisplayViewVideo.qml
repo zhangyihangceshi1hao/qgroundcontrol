@@ -1,4 +1,4 @@
-/****************************************************************************
+﻿/****************************************************************************
  *
  * (c) 2009-2020 QGROUNDCONTROL PROJECT <http://www.qgroundcontrol.org>
  *
@@ -183,6 +183,7 @@ Item {
             onVisibleChanged: {
                 thermalItem.pipOrNot()
             }
+            /*
             QGCVideoBackground {
                 id:             thermalVideo
                 objectName:     "thermalVideo"
@@ -190,6 +191,7 @@ Item {
                 receiver:       QGroundControl.videoManager.thermalVideoReceiver
                 opacity:        _camera ? (_camera.thermalMode === QGCCameraControl.THERMAL_BLEND ? _camera.thermalOpacity / 100 : 1.0) : 0
             }
+            */
         }
         //-- Zoom
         PinchArea {

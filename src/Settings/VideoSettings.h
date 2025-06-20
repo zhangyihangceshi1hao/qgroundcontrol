@@ -1,4 +1,4 @@
-/****************************************************************************
+﻿/****************************************************************************
  *
  * (c) 2009-2020 QGROUNDCONTROL PROJECT <http://www.qgroundcontrol.org>
  *
@@ -24,6 +24,9 @@ public:
     DEFINE_SETTINGFACT(udpPort)
     DEFINE_SETTINGFACT(tcpUrl)
     DEFINE_SETTINGFACT(rtspUrl)
+    DEFINE_SETTINGFACT(rtspUrl02)
+    DEFINE_SETTINGFACT(rtspUrl03)
+    DEFINE_SETTINGFACT(rtspUrl04)
     DEFINE_SETTINGFACT(aspectRatio)
     DEFINE_SETTINGFACT(videoFit)
     DEFINE_SETTINGFACT(gridLines)

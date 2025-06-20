@@ -1,4 +1,4 @@
-{
+﻿{
     "version":      1,
     "fileType":  "FactMetaData",
     "QGC.MetaData.Facts":
@@ -340,6 +340,13 @@
     "longDesc":  "Ardupilot Support server to forward mavlink to. i.e: support.ardupilot.org:xxxx",
     "type":      "string",
     "default":   "support.ardupilot.org:xxxx"
+},
+{
+    "name":             "videoViewType",
+    "type":             "uint32",
+    "enumStrings":      "单路视频窗口, 双路视频窗口, 四路视频窗口",
+    "enumValues":       "0,1,2",
+    "default":          0
 }
 ]
 }

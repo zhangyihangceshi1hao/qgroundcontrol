@@ -1,4 +1,4 @@
-/***************_qgcTranslatorSourceCode***********************************************
+﻿/***************_qgcTranslatorSourceCode***********************************************
  *
  * (c) 2009-2020 QGROUNDCONTROL PROJECT <http://www.qgroundcontrol.org>
  *
@@ -25,7 +25,8 @@ public:
     AppSettings(QObject* parent = nullptr);
 
     DEFINE_SETTING_NAME_GROUP()
-
+    // 新增自定义变量，记录窗口数量类型（单路、双路、四路）
+    DEFINE_SETTINGFACT(videoViewType)
     DEFINE_SETTINGFACT(offlineEditingFirmwareClass)
     DEFINE_SETTINGFACT(offlineEditingVehicleClass)
     DEFINE_SETTINGFACT(offlineEditingCruiseSpeed)

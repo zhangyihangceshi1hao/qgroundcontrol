@@ -1,4 +1,4 @@
-/****************************************************************************
+﻿/****************************************************************************
  *
  * (c) 2009-2020 QGROUNDCONTROL PROJECT <http://www.qgroundcontrol.org>
  *
@@ -43,7 +43,15 @@ public:
     Q_PROPERTY(QString          uvcVideoSourceID        READ    uvcVideoSourceID                            NOTIFY uvcVideoSourceIDChanged)
     Q_PROPERTY(bool             uvcEnabled              READ    uvcEnabled                                  CONSTANT)
     Q_PROPERTY(bool             fullScreen              READ    fullScreen      WRITE   setfullScreen       NOTIFY fullScreenChanged)
+    // 第一路图传
     Q_PROPERTY(VideoReceiver*   videoReceiver           READ    videoReceiver                               CONSTANT)
+    // 第二路图传
+    Q_PROPERTY(VideoReceiver*   thermalVideoReceiver    READ    thermalVideoReceiver                        CONSTANT)
+    // 第三路图传
+    Q_PROPERTY(VideoReceiver*   thirdVideoReceiver      READ    thirdVideoReceiver                          CONSTANT)
+    // 第四路图传
+    Q_PROPERTY(VideoReceiver*   fourthVideoReceiver     READ    fourthVideoReceiver                          CONSTANT)
+
     Q_PROPERTY(VideoReceiver*   thermalVideoReceiver    READ    thermalVideoReceiver                        CONSTANT)
     Q_PROPERTY(double           aspectRatio             READ    aspectRatio                                 NOTIFY aspectRatioChanged)
     Q_PROPERTY(double           thermalAspectRatio      READ    thermalAspectRatio                          NOTIFY aspectRatioChanged)
@@ -92,6 +100,8 @@ public:
 // new arcitecture does not assume direct access to video receiver from QML side, even if it works for now
     virtual VideoReceiver*  videoReceiver           () { return _videoReceiver[0]; }
     virtual VideoReceiver*  thermalVideoReceiver    () { return _videoReceiver[1]; }
+    virtual VideoReceiver*  thirdVideoReceiver      () { return _videoReceiver[2]; }
+    virtual VideoReceiver*  fourthVideoReceiver     () { return _videoReceiver[3]; }
 
 #if defined(QGC_DISABLE_UVC)
     virtual bool        uvcEnabled          () { return false; }
@@ -113,6 +123,10 @@ public:
 
     Q_INVOKABLE void grabImage(const QString& imageFile = QString());
 
+    /* 新增多路图传信号槽绑定  */
+    // 绑定各通道的启动/停止信号槽（多路共用）
+    void _bindSecondaryStream(VideoReceiver* receiver, int index);
+
 signals:
     void hasVideoChanged            ();
     void isGStreamerChanged         ();
@@ -133,7 +147,11 @@ signals:
 protected slots:
     void _videoSourceChanged        ();
     void _udpPortChanged            ();
+    // 新增多路图传模块
     void _rtspUrlChanged            ();
+    void _rtspUrl02Changed          ();
+    void _rtspUrl03Changed          ();
+    void _rtspUrl04Changed          ();
     void _tcpUrlChanged             ();
     void _lowLatencyModeChanged     ();
     void _updateUVC                 ();
@@ -154,20 +172,25 @@ protected:
     void _stopReceiver              (unsigned id);
 
 protected:
+
+    // ***************** 图传数量 *****************
+    // 成员变量：支持4路图传
+    int videoCounts = 4;
+
     QString                 _videoFile;
     QString                 _imageFile;
     SubtitleWriter          _subtitleWriter;
     bool                    _isTaisync              = false;
-    VideoReceiver*          _videoReceiver[2]       = { nullptr, nullptr };
-    void*                   _videoSink[2]           = { nullptr, nullptr };
-    QString                 _videoUri[2];
+    VideoReceiver*          _videoReceiver[4]       = { nullptr, nullptr, nullptr, nullptr }; // 新增4路图传
+    void*                   _videoSink[4]           = { nullptr, nullptr, nullptr, nullptr }; // 新增4路图传
+    QString                 _videoUri[4]; // 新增4路图传
     // FIXME: AV: _videoStarted seems to be access from 3 different threads, from time to time
     // 1) Video Receiver thread
     // 2) Video Manager/main app thread
     // 3) Qt rendering thread (during video sink creation process which should happen in this thread)
     // It works for now but...
-    bool                    _videoStarted[2]        = { false, false };
-    bool                    _lowLatencyStreaming[2] = { false, false };
+    bool                    _videoStarted[4]        = { false, false, false, false }; // 新增4路图传
+    bool                    _lowLatencyStreaming[4] = { false, false, false, false }; // 新增4路图传
     QAtomicInteger<bool>    _streaming              = false;
     QAtomicInteger<bool>    _decoding               = false;
     QAtomicInteger<bool>    _recording              = false;

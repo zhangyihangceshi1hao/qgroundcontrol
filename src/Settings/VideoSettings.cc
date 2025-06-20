@@ -1,4 +1,4 @@
-/****************************************************************************
+﻿/****************************************************************************
  *
  * (c) 2009-2020 QGROUNDCONTROL PROJECT <http://www.qgroundcontrol.org>
  *
@@ -179,6 +179,33 @@ DECLARE_SETTINGSFACT_NO_FUNC(VideoSettings, rtspUrl)
         connect(_rtspUrlFact, &Fact::valueChanged, this, &VideoSettings::_configChanged);
     }
     return _rtspUrlFact;
+}
+
+DECLARE_SETTINGSFACT_NO_FUNC(VideoSettings, rtspUrl02)
+{
+    if (!_rtspUrl02Fact) {
+        _rtspUrl02Fact = _createSettingsFact(rtspUrl02Name);
+        connect(_rtspUrl02Fact, &Fact::valueChanged, this, &VideoSettings::_configChanged);
+    }
+    return _rtspUrl02Fact;
+}
+
+DECLARE_SETTINGSFACT_NO_FUNC(VideoSettings, rtspUrl03)
+{
+    if (!_rtspUrl03Fact) {
+        _rtspUrl03Fact = _createSettingsFact(rtspUrl03Name);
+        connect(_rtspUrl03Fact, &Fact::valueChanged, this, &VideoSettings::_configChanged);
+    }
+    return _rtspUrl03Fact;
+}
+
+DECLARE_SETTINGSFACT_NO_FUNC(VideoSettings, rtspUrl04)
+{
+    if (!_rtspUrl04Fact) {
+        _rtspUrl04Fact = _createSettingsFact(rtspUrl04Name);
+        connect(_rtspUrl04Fact, &Fact::valueChanged, this, &VideoSettings::_configChanged);
+    }
+    return _rtspUrl04Fact;
 }
 
 DECLARE_SETTINGSFACT_NO_FUNC(VideoSettings, tcpUrl)
