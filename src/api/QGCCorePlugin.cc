@@ -1,4 +1,4 @@
-/****************************************************************************
+﻿/****************************************************************************
  *
  * (c) 2009-2020 QGROUNDCONTROL PROJECT <http://www.qgroundcontrol.org>
  *
@@ -43,6 +43,8 @@ public:
     {
         if(pGeneral)
             delete pGeneral;
+        if(pCustomView)
+            delete pCustomView;
         if(pCommLinks)
             delete pCommLinks;
         if(pOfflineMaps)
@@ -72,6 +74,8 @@ public:
         if(defaultOptions)
             delete defaultOptions;
     }
+
+    QmlComponentInfo* pCustomView              = nullptr;
 
     QmlComponentInfo* pGeneral                  = nullptr;
     QmlComponentInfo* pCommLinks                = nullptr;
@@ -135,6 +139,11 @@ QVariantList &QGCCorePlugin::settingsPages()
                                               QUrl::fromUserInput("qrc:/qml/LinkSettings.qml"),
                                               QUrl::fromUserInput("qrc:/res/waves.svg"));
         _p->settingsList.append(QVariant::fromValue(reinterpret_cast<QmlComponentInfo*>(_p->pCommLinks)));
+        // Custom View
+        _p->pCustomView = new QmlComponentInfo("自定义页面",
+                                               QUrl::fromUserInput("qrc:/qml/CustomSettings.qml"),
+                                               QUrl::fromUserInput("qrc:/res/waves.svg"));
+        _p->settingsList.append(QVariant::fromValue(reinterpret_cast<QmlComponentInfo*>(_p->pCustomView)));
         _p->pOfflineMaps = new QmlComponentInfo(tr("Offline Maps"),
                                                 QUrl::fromUserInput("qrc:/qml/OfflineMap.qml"),
                                                 QUrl::fromUserInput("qrc:/res/waves.svg"));

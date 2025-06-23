@@ -1,4 +1,4 @@
-/****************************************************************************
+﻿/****************************************************************************
  *
  * (c) 2009-2020 QGROUNDCONTROL PROJECT <http://www.qgroundcontrol.org>
  *
@@ -69,7 +69,8 @@ Rectangle {
             spacing:            ScreenTools.defaultFontPixelHeight / 2
             Repeater {
                 model: QGroundControl.linkManager.linkConfigurations
-                delegate: QGCButton {
+                delegate: CustomListButton {
+                    id:                         _listButton
                     anchors.horizontalCenter:   settingsColumn.horizontalCenter
                     width:                      _linkRoot.width * 0.5
                     text:                       object.name
@@ -78,7 +79,33 @@ Rectangle {
                     onClicked: {
                         checked = true
                         _currentSelection = object
-                        console.log("clicked", object, object.link)
+                    }
+
+                    // 删除按钮
+                    Item {
+                        height: parent.height
+                        width: height
+                        anchors.right: parent.right
+
+                        QGCColoredImage {
+                            source:                 "/res/XDelete.svg"
+                            height:                 parent.height * 0.5
+                            width:                  height
+                            color:                  "white"
+                            fillMode:               Image.PreserveAspectFit
+                            sourceSize.height:      height
+                            anchors.centerIn:       parent
+                        }
+
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: {
+                                console.log("点击删除按钮")
+                                _listButton.checked = true
+                                _currentSelection = object
+                                deleteDialog.visible = true
+                            }
+                        }
                     }
                 }
             }
@@ -96,7 +123,7 @@ Rectangle {
             text:       qsTr("Delete")
             enabled:    _currentSelection && !_currentSelection.dynamic
             onClicked:  deleteDialog.visible = true
-
+            visible:    false
             MessageDialog {
                 id:         deleteDialog
                 visible:    false

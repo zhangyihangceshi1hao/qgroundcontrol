@@ -1,4 +1,4 @@
-/****************************************************************************
+﻿/****************************************************************************
  *
  * (c) 2009-2020 QGROUNDCONTROL PROJECT <http://www.qgroundcontrol.org>
  *
@@ -29,6 +29,11 @@ ToolStripActionList {
         GuidedActionRTL { },
         GuidedActionPause { },
         GuidedActionActionList { },
-        GuidedActionGripper { }
+        GuidedActionGripper { },
+        ToolStripAction {
+            text:           qsTr("自定义设置")
+            iconSource:     "/qmlimages/PatternPresets.png"
+            onTriggered:    mainWindow.showToolSelectDialog()
+        }
     ]
 }

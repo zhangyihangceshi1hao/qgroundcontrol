@@ -1,4 +1,4 @@
-/****************************************************************************
+﻿/****************************************************************************
  *
  * (c) 2009-2020 QGROUNDCONTROL PROJECT <http://www.qgroundcontrol.org>
  *
@@ -132,10 +132,11 @@ Item {
             }
         }
 
+        // 航向角指向图标
         Image {
             id:                 pointer
             width:              size * 0.65
-            source:             vehicle ? vehicle.vehicleImageCompass : ""
+            source:             "/res/QGCLogoArrow" //vehicle ? vehicle.vehicleImageCompass : ""
             mipmap:             true
             sourceSize.width:   width
             fillMode:           Image.PreserveAspectFit

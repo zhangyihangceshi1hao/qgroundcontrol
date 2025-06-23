@@ -439,7 +439,7 @@ ApplicationWindow {
 
     Drawer {
         id:             toolDrawer
-        width:          mainWindow.width
+        width:          mainWindow.width * 0.85
         height:         mainWindow.height
         edge:           Qt.LeftEdge
         dragMargin:     0
@@ -463,7 +463,7 @@ ApplicationWindow {
             anchors.right:  parent.right
             anchors.top:    parent.top
             height:         ScreenTools.toolbarHeight
-            color:          qgcPal.toolbarBackground
+            color:          Qt.rgba(0, 0, 0, 0.9) //qgcPal.toolbarBackground
 
             RowLayout {
                 anchors.leftMargin: ScreenTools.defaultFontPixelWidth

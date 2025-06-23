@@ -1,4 +1,4 @@
-Module QGroundControl.Controls
+﻿Module QGroundControl.Controls
 
 AnalyzePage                             1.0 AnalyzePage.qml
 AppMessages                             1.0 AppMessages.qml
@@ -55,6 +55,7 @@ PreFlightCheckButton                    1.0 PreFlightCheckButton.qml
 PreFlightCheckGroup                     1.0 PreFlightCheckGroup.qml
 PreFlightCheckModel                     1.0 PreFlightCheckModel.qml
 QGCButton                               1.0 QGCButton.qml
+CustomListButton                        1.0 CustomListButton.qml
 QGCColumnButton                         1.0 QGCColumnButton.qml
 AutotuneUI                              1.0 AutotuneUI.qml
 QGCCheckBox                             1.0 QGCCheckBox.qml
