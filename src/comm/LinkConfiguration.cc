@@ -1,4 +1,4 @@
-/****************************************************************************
+﻿/****************************************************************************
  *
  * (c) 2009-2020 QGROUNDCONTROL PROJECT <http://www.qgroundcontrol.org>
  *
@@ -14,6 +14,7 @@
 #include "UDPLink.h"
 #include "TCPLink.h"
 #include "LogReplayLink.h"
+#include "MqttLink.h"
 #ifdef QGC_ENABLE_BLUETOOTH
 #include "BluetoothLink.h"
 #endif
@@ -80,6 +81,9 @@ LinkConfiguration* LinkConfiguration::createSettings(int type, const QString& na
         case LinkConfiguration::TypeTcp:
             config = new TCPConfiguration(name);
             break;
+        case LinkConfiguration::TypeMqtt:
+            config = new MqttConfiguration(name);
+            break;
 #ifdef QGC_ENABLE_BLUETOOTH
     case LinkConfiguration::TypeBluetooth:
         config = new BluetoothConfiguration(name);
@@ -115,6 +119,9 @@ LinkConfiguration* LinkConfiguration::duplicateSettings(LinkConfiguration* sourc
             break;
         case TypeTcp:
             dupe = new TCPConfiguration(qobject_cast<TCPConfiguration*>(source));
+            break;
+        case TypeMqtt:
+            dupe = new MqttConfiguration(qobject_cast<MqttConfiguration*>(source));
             break;
 #ifdef QGC_ENABLE_BLUETOOTH
         case TypeBluetooth:

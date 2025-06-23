@@ -1,4 +1,4 @@
-/****************************************************************************
+﻿/****************************************************************************
  *
  * (c) 2009-2020 QGROUNDCONTROL PROJECT <http://www.qgroundcontrol.org>
  *
@@ -22,6 +22,7 @@
 #include "QGCApplication.h"
 #include "UDPLink.h"
 #include "TCPLink.h"
+#include "MqttLink.h"
 #include "SettingsManager.h"
 #include "LogReplayLink.h"
 #ifdef QGC_ENABLE_BLUETOOTH
@@ -125,6 +126,9 @@ bool LinkManager::createConnectedLink(SharedLinkConfigurationPtr& config, bool i
         break;
     case LinkConfiguration::TypeTcp:
         link = std::make_shared<TCPLink>(config);
+        break;
+    case LinkConfiguration::TypeMqtt:
+        link = std::make_shared<MqttLink>(config);
         break;
 #ifdef QGC_ENABLE_BLUETOOTH
     case LinkConfiguration::TypeBluetooth:
@@ -322,6 +326,9 @@ void LinkManager::loadLinkConfigurationList()
                                 break;
                             case LinkConfiguration::TypeTcp:
                                 link = new TCPConfiguration(name);
+                                break;
+                            case LinkConfiguration::TypeMqtt:
+                                link = new MqttConfiguration(name);
                                 break;
 #ifdef QGC_ENABLE_BLUETOOTH
                             case LinkConfiguration::TypeBluetooth:
@@ -692,6 +699,7 @@ QStringList LinkManager::linkTypeStrings(void) const
 #endif
         list += tr("UDP");
         list += tr("TCP");
+        list+=tr("Mqtt");
 #ifdef QGC_ENABLE_BLUETOOTH
         list += "Bluetooth";
 #endif

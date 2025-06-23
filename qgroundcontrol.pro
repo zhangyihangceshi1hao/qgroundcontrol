@@ -424,6 +424,7 @@ INCLUDEPATH += \
     src/ui/px4_configuration \
     src/ui/toolbar \
     src/ui/uas \
+    src/qmqtt \
 
 contains (DEFINES, QGC_ENABLE_PAIRING) {
     INCLUDEPATH += \
@@ -769,6 +770,25 @@ HEADERS += \
     src/uas/UASMessageHandler.h \
     src/AnalyzeView/GeoTagController.h \
     src/AnalyzeView/ExifParser.h \
+    src/comm/MqttLink.h \
+    src/qmqtt/qmqtt.h \
+    src/qmqtt/qmqtt_client.h \
+    src/qmqtt/qmqtt_client_p.h \
+    src/qmqtt/qmqtt_frame.h \
+    src/qmqtt/qmqtt_global.h \
+    src/qmqtt/qmqtt_message.h \
+    src/qmqtt/qmqtt_message_p.h \
+    src/qmqtt/qmqtt_network_p.h \
+    src/qmqtt/qmqtt_networkinterface.h \
+    src/qmqtt/qmqtt_routedmessage.h \
+    src/qmqtt/qmqtt_router.h \
+    src/qmqtt/qmqtt_routesubscription.h \
+    src/qmqtt/qmqtt_socket_p.h \
+    src/qmqtt/qmqtt_socketinterface.h \
+    src/qmqtt/qmqtt_ssl_socket_p.h \
+    src/qmqtt/qmqtt_timer_p.h \
+    src/qmqtt/qmqtt_timerinterface.h \
+    src/qmqtt/qmqttclient.h \
 
 contains (DEFINES, QGC_ENABLE_PAIRING) {
     HEADERS += \
@@ -1030,6 +1050,18 @@ SOURCES += \
     src/uas/UASMessageHandler.cc \
     src/AnalyzeView/GeoTagController.cc \
     src/AnalyzeView/ExifParser.cc \
+    src/comm/MqttLink.cc \
+    src/qmqtt/qmqtt_client.cc \
+    src/qmqtt/qmqtt_client_p.cc \
+    src/qmqtt/qmqtt_frame.cc \
+    src/qmqtt/qmqtt_message.cc \
+    src/qmqtt/qmqtt_network.cc \
+    src/qmqtt/qmqtt_router.cc \
+    src/qmqtt/qmqtt_routesubscription.cc \
+    src/qmqtt/qmqtt_socket.cc \
+    src/qmqtt/qmqtt_ssl_socket.cc \
+    src/qmqtt/qmqtt_timer.cc \
+    src/qmqtt/qmqttclient.cc \
 
 contains (DEFINES, QGC_ENABLE_PAIRING) {
     SOURCES += \

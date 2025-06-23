@@ -1,4 +1,4 @@
-/****************************************************************************
+﻿/****************************************************************************
  *
  * (c) 2009-2020 QGROUNDCONTROL PROJECT <http://www.qgroundcontrol.org>
  *
@@ -50,6 +50,7 @@ public:
 #endif
         TypeUdp,        ///< UDP Link
         TypeTcp,        ///< TCP Link
+        TypeMqtt,
 #ifdef QGC_ENABLE_BLUETOOTH
         TypeBluetooth,  ///< Bluetooth Link
 #endif
