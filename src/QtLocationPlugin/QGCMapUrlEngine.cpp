@@ -1,4 +1,4 @@
-/****************************************************************************
+﻿/****************************************************************************
  *
  * (c) 2009-2020 QGROUNDCONTROL PROJECT <http://www.qgroundcontrol.org>
  *
@@ -89,6 +89,7 @@ UrlFactory::UrlFactory() : _timeout(5 * 1000) {
     _providersTable["LINZ Basemap"] = new LINZBasemapMapProvider(this);
 
     _providersTable["CustomURL Custom"] = new CustomURLMapProvider(this);
+    _providersTable["GaoDe Map"] = new CustomURLMapProvider(this);
 }
 
 void UrlFactory::registerProvider(QString name, MapProvider* provider) {

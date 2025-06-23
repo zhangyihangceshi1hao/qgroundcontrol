@@ -1,4 +1,4 @@
-/****************************************************************************
+﻿/****************************************************************************
  *
  * (c) 2009-2020 QGROUNDCONTROL PROJECT <http://www.qgroundcontrol.org>
  *
@@ -70,16 +70,16 @@ class LINZBasemapMapProvider : public MapProvider {
     QString _getURL(const int x, const int y, const int zoom, QNetworkAccessManager* networkManager) override;
 };
 
+
 class CustomURLMapProvider : public MapProvider {
     Q_OBJECT
-  public:
+public:
     CustomURLMapProvider(QObject* parent = nullptr)
-        : MapProvider(QStringLiteral(""), QStringLiteral(""),
+        : MapProvider(QStringLiteral("webapi.amap.com"), QStringLiteral("jpg"),
                       AVERAGE_TILE_SIZE, QGeoMapType::CustomMap, parent) {}
 
     QString _getURL(const int x, const int y, const int zoom, QNetworkAccessManager* networkManager) override;
 };
-
 class StatkartMapProvider : public MapProvider {
     Q_OBJECT
   public:

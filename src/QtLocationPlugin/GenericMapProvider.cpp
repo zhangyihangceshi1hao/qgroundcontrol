@@ -1,4 +1,4 @@
-/****************************************************************************
+﻿/****************************************************************************
  *
  * (c) 2009-2020 QGROUNDCONTROL PROJECT <http://www.qgroundcontrol.org>
  *
@@ -53,9 +53,10 @@ QString LINZBasemapMapProvider::_getURL(const int x, const int y, const int zoom
 }
 
 QString CustomURLMapProvider::_getURL(const int x, const int y, const int zoom, QNetworkAccessManager* networkManager) {
-    Q_UNUSED(networkManager)
-    QString url = qgcApp()->toolbox()->settingsManager()->appSettings()->customURL()->rawValue().toString();
-    return url.replace("{x}",QString::number(x)).replace("{y}",QString::number(y)).replace(QRegExp("\\{(z|zoom)\\}"),QString::number(zoom));
+    // Q_UNUSED(networkManager)
+    // QString url = qgcApp()->toolbox()->settingsManager()->appSettings()->customURL()->rawValue().toString();
+    // return url.replace("{x}",QString::number(x)).replace("{y}",QString::number(y)).replace(QRegExp("\\{(z|zoom)\\}"),QString::number(zoom));
+ return QStringLiteral("http://webst01.is.autonavi.com/appmaptile?style=6&x=%1&y=%2&z=%3").arg(x).arg(y).arg(zoom);
 }
 
 static const QString StatkartMapUrl = QStringLiteral("http://opencache.statkart.no/gatekeeper/gk/gk.open_gmaps?layers=topo4&zoom=%1&x=%2&y=%3");
