@@ -1,4 +1,4 @@
-/****************************************************************************
+﻿/****************************************************************************
  *
  * (c) 2009-2020 QGROUNDCONTROL PROJECT <http://www.qgroundcontrol.org>
  *
@@ -1304,8 +1304,25 @@ void MockLink::_sendHomePosition(void)
 void MockLink::_sendGpsRawInt(void)
 {
     static uint64_t timeTick = 0;
-    mavlink_message_t msg;
+    static double t = 0.0;
+    t += 0.0005;            // 控制动画速度（每秒 1 次则每次+0.1 rad）
 
+    // 中心点偏移（每架飞机一个中心点）
+    double centerLat = _defaultVehicleLatitude  + ((_vehicleSystemId - 128) * 0.001);
+    double centerLon = _defaultVehicleLongitude + ((_vehicleSystemId - 128) * 0.001);
+
+    // 半径为3000米对应的角度（单位°）
+    const double radiusLat = 3000.0 / 111000.0;
+    const double radiusLon = 3000.0 / (111000.0 * cos(centerLat * M_PI / 180.0));
+
+    // 水平八字轨迹
+    double offsetLat = radiusLat * std::sin(t) * std::cos(t);
+    double offsetLon = radiusLon * std::sin(t);
+
+    _vehicleLatitude  = centerLat  + offsetLat;
+    _vehicleLongitude = centerLon + offsetLon;
+
+    mavlink_message_t msg;
     mavlink_msg_gps_raw_int_pack_chan(_vehicleSystemId,
                                       _vehicleComponentId,
                                       mavlinkChannel(),
@@ -1319,13 +1336,7 @@ void MockLink::_sendGpsRawInt(void)
                                       UINT16_MAX,                           // velocity not known
                                       UINT16_MAX,                           // course over ground not known
                                       8,                                    // satellites visible
-                                      //-- Extension
-                                      0,                                    // Altitude (above WGS84, EGM96 ellipsoid), in meters * 1000 (positive for up).
-                                      0,                                    // Position uncertainty in meters * 1000 (positive for up).
-                                      0,                                    // Altitude uncertainty in meters * 1000 (positive for up).
-                                      0,                                    // Speed uncertainty in meters * 1000 (positive for up).
-                                      0,                                    // Heading / track uncertainty in degrees * 1e5.
-                                      65535);                               // Yaw not provided
+                                      0, 0, 0, 0, 0, 65535);                // extensions
     respondWithMavlinkMessage(msg);
 }
 

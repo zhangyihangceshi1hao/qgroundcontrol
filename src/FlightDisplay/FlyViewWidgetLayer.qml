@@ -1,4 +1,4 @@
-/****************************************************************************
+﻿/****************************************************************************
  *
  * (c) 2009-2020 QGROUNDCONTROL PROJECT <http://www.qgroundcontrol.org>
  *
@@ -98,11 +98,17 @@ Item {
 
     MultiVehicleList {
         anchors.margins:    _toolsMargin
-        anchors.top:        multiVehiclePanelSelector.bottom
+        anchors.top:        multiVehiclePanelSelector.visible ? multiVehiclePanelSelector.bottom : parent.top
         anchors.right:      parent.right
-        width:              _rightPanelWidth
+        width:              multiVehiclePanelSelector.showSingleVehiclePanel ? _rightPanelWidth : ScreenTools.defaultFontPixelWidth * 40
+        // width:               _rightPanelWidth
         height:             parent.height - y - _toolsMargin
-        visible:            !multiVehiclePanelSelector.showSingleVehiclePanel
+        visible:            globals.activeVehicle && !multiVehiclePanelSelector.showSingleVehiclePanel
+
+        Component.onCompleted: {
+            for(var i=0; i<7; i++)
+                QGroundControl.startPX4MockLink(false)
+        }
     }
 
 

@@ -1,4 +1,4 @@
-/****************************************************************************
+﻿/****************************************************************************
  *
  * (c) 2009-2020 QGROUNDCONTROL PROJECT <http://www.qgroundcontrol.org>
  *
@@ -253,26 +253,46 @@ FlightMap {
         showText: !pipMode
     }
 
+    // // Add trajectory lines to the map
+    // MapPolyline {
+    //     id:         trajectoryPolyline
+    //     line.width: 3
+    //     line.color: "red"
+    //     z:          QGroundControl.zOrderTrajectoryLines
+    //     visible:    !pipMode
+
+    //     Connections {
+    //         target:                 QGroundControl.multiVehicleManager
+    //         function onActiveVehicleChanged(activeVehicle) {
+    //             trajectoryPolyline.path = _activeVehicle ? _activeVehicle.trajectoryPoints.list() : []
+    //         }
+    //     }
+
+    //     Connections {
+    //         target:                 _activeVehicle ? _activeVehicle.trajectoryPoints : null
+    //         onPointAdded:           trajectoryPolyline.addCoordinate(coordinate)
+    //         onUpdateLastPoint:      trajectoryPolyline.replaceCoordinate(trajectoryPolyline.pathLength() - 1, coordinate)
+    //         onPointsCleared:        trajectoryPolyline.path = []
+    //     }
+    // }
+
     // Add trajectory lines to the map
-    MapPolyline {
-        id:         trajectoryPolyline
-        line.width: 3
-        line.color: "red"
-        z:          QGroundControl.zOrderTrajectoryLines
-        visible:    !pipMode
+    // 新增多架设备轨迹模块
+    MapItemView {
+        model: QGroundControl.multiVehicleManager.vehicles
+        delegate:MapPolyline {
+            id:         trajectoryPolyline
+            line.width: 3
+            line.color: globals.isMultiVehicle ? mainWindow.getColorForId(object.id) : "red"
+            z:          QGroundControl.zOrderTrajectoryLines
+            visible:    !pipMode
 
-        Connections {
-            target:                 QGroundControl.multiVehicleManager
-            function onActiveVehicleChanged(activeVehicle) {
-                trajectoryPolyline.path = _activeVehicle ? _activeVehicle.trajectoryPoints.list() : []
+            Connections {
+                target:                 object ? object.trajectoryPoints : null
+                onPointAdded:           trajectoryPolyline.addCoordinate(coordinate)
+                onUpdateLastPoint:      trajectoryPolyline.replaceCoordinate(trajectoryPolyline.pathLength() - 1, coordinate)
+                onPointsCleared:        trajectoryPolyline.path = []
             }
-        }
-
-        Connections {
-            target:                 _activeVehicle ? _activeVehicle.trajectoryPoints : null
-            onPointAdded:           trajectoryPolyline.addCoordinate(coordinate)
-            onUpdateLastPoint:      trajectoryPolyline.replaceCoordinate(trajectoryPolyline.pathLength() - 1, coordinate)
-            onPointsCleared:        trajectoryPolyline.path = []
         }
     }
 

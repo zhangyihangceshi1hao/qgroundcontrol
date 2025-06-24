@@ -77,7 +77,12 @@ ApplicationWindow {
 
     QtObject {
         id: globals
-
+        /* 判断是否为多架模式 */
+        property bool isMultiVehicle: QGroundControl.multiVehicleManager.vehicles.count > 1
+        onIsMultiVehicleChanged: {
+            if(isMultiVehicle) console.log("[单架模式]")
+            else console.log("[多架模式]")
+        }
         readonly property var       activeVehicle:                  QGroundControl.multiVehicleManager.activeVehicle
         readonly property real      defaultTextHeight:              ScreenTools.defaultFontPixelHeight
         readonly property real      defaultTextWidth:               ScreenTools.defaultFontPixelWidth
@@ -103,7 +108,18 @@ ApplicationWindow {
     signal vtolTransitionToFwdFlightRequest
     signal vtolTransitionToMRFlightRequest
     signal showPreFlightChecklistIfNeeded
+    /* 根据设备id分配颜色 */
+    function getColorForId(id) {
+        //console.log("[根据设备id分配颜色] id:", id)
+        if (id < 1 || id > 255) {
+           console.log("Error: 设备ID异常, id:", id)
+           return "red"
+        }
+        var goldenAngle = 137.508;
+        var hue = (id * goldenAngle) % 360;
 
+        return Qt.hsla(hue / 360.0, 1.0, 0.6, 1.0);
+    }
     //-------------------------------------------------------------------------
     //-- Global Scope Functions
 
