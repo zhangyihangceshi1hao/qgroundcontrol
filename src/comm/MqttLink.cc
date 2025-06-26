@@ -9,7 +9,7 @@
 #include "qsslconfiguration.h"
 
 const QString DEAFAULT_HOST = QString("192.168.1.1"); // 默认MQTT服务器地址
-const quint16 DEAFAULT_PORT = 8883;
+// const quint16 DEAFAULT_PORT = 8883;
 const quint16 DEFAULT_MQTT_PORT = 1883;
 
 /// @file

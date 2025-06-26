@@ -19,12 +19,12 @@ public:
         : QMQTT::Client(host, port, parent)
         , _number(0){
 
-        //qDebug() << "[¹¹ÔìMQTT] topic:" << topic;
+        //qDebug() << "[ï¿½ï¿½ï¿½ï¿½MQTT] topic:" << topic;
 
         encrypt_ = encrypt;
 
-        //this->setClientId("any"); // Á¬½ÓÊ±ÉèÖÃ
-        //this->setTopics(topic); // Á¬½ÓÊ±ÉèÖÃ»°Ìâ
+        //this->setClientId("any"); // ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½
+        //this->setTopics(topic); // ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½Ã»ï¿½ï¿½ï¿½
 
         this->setKeepAlive(60);
         this->setCleanSession(1);
@@ -43,7 +43,7 @@ public:
         : QMQTT::Client(hostName, port, sslConfig)
         , _number(0){
 
-        qDebug() << "[¹¹ÔìMqtt·½Ê½2]";
+        qDebug() << "[ï¿½ï¿½ï¿½ï¿½Mqttï¿½ï¿½Ê½2]";
 
         encrypt_ = encrypt;
         _isConnected =false;
@@ -68,10 +68,10 @@ public:
 
     void setTopics(QString topic){
         _topic = topic;
-        QString topicSub = topic + "/MAV";  // ¶©ÔÄ»°Ìâ£¨¶©ÔÄ·É¿Ø·¢ËÍµÄÊý¾Ý£©
-        QString topicPub = topic + "/GCS";  // ·¢²¼»°Ìâ£¨·¢ËÍµØÃæÕ¾Êý¾Ýµ½·É¿Ø¶Ë£©
+        QString topicSub = topic + "/MAV";  // ï¿½ï¿½ï¿½Ä»ï¿½ï¿½â£¨ï¿½ï¿½ï¿½Ä·É¿Ø·ï¿½ï¿½Íµï¿½ï¿½ï¿½ï¿½Ý£ï¿½
+        QString topicPub = topic + "/GCS";  // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½â£¨ï¿½ï¿½ï¿½Íµï¿½ï¿½ï¿½Õ¾ï¿½ï¿½ï¿½Ýµï¿½ï¿½É¿Ø¶Ë£ï¿½
 
-       // qDebug() << "[MQTT] ÉèÖÃ»°Ìâ " << "¶©ÔÄ·É¿Ø»°Ìâ:" << topicSub << " ·¢²¼µØÃæÕ¾»°Ìâ:" << topicPub;
+       // qDebug() << "[MQTT] ï¿½ï¿½ï¿½Ã»ï¿½ï¿½ï¿½ " << "ï¿½ï¿½ï¿½Ä·É¿Ø»ï¿½ï¿½ï¿½:" << topicSub << " ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Õ¾ï¿½ï¿½ï¿½ï¿½:" << topicPub;
         qDebug() << "[MQTT] Set Topic " << "Sub:" << topicSub << " Pub:" << topicPub;
 
         setTopicSub(topicSub);
@@ -115,16 +115,16 @@ public:
 
 public slots:
     void onConnected(){
-        //qDebug() << "[Á¬½ÓMQTT] " << _topic;
+        //qDebug() << "[ï¿½ï¿½ï¿½ï¿½MQTT] " << _topic;
         subscribe(_topicSub, 0);
         _isConnected =true;
         qDebug() << "[MQTT] Connected" << _topic << QDateTime::currentDateTime().toString("hh:mm:ss");
     }
 
     void onDisconnected(){
-        //qDebug() << "[¶Ï¿ªMQTT] " << _topic;
+        //qDebug() << "[ï¿½Ï¿ï¿½MQTT] " << _topic;
         _isConnected =false;
-        //qDebug()<< "[MQTT] ÒÑ¶Ï¿ª " << _topic << QDateTime::currentDateTime().toString("hh:mm:ss");
+        //qDebug()<< "[MQTT] ï¿½Ñ¶Ï¿ï¿½ " << _topic << QDateTime::currentDateTime().toString("hh:mm:ss");
     }
 
     void onSubscribed(const QString& topic){

@@ -1,4 +1,4 @@
-/*
+﻿/*
  * qmqtt_socket.cpp - qmqtt socket
  *
  * Copyright (c) 2013  Ery Lee <ery.lee at gmail dot com>
@@ -39,7 +39,7 @@ QMQTT::Socket::Socket(QObject* parent)
     connect(_socket.data(), &QTcpSocket::connected,    this, &SocketInterface::connected);
     connect(_socket.data(), &QTcpSocket::disconnected, this, &SocketInterface::disconnected);
     connect(_socket.data(),
-            static_cast<void (QTcpSocket::*)(QAbstractSocket::SocketError)>(&QTcpSocket::error),
+            static_cast<void (QTcpSocket::*)(QAbstractSocket::SocketError)>(&QTcpSocket::errorOccurred),
             this,
             static_cast<void (SocketInterface::*)(QAbstractSocket::SocketError)>(&SocketInterface::error));
 }

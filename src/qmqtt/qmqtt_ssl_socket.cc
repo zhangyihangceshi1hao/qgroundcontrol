@@ -1,4 +1,4 @@
-/*
+﻿/*
  * qmqtt_ssl_socket.cpp - qmqtt SSL socket
  *
  * Copyright (c) 2013  Ery Lee <ery.lee at gmail dot com>
@@ -47,7 +47,7 @@ QMQTT::SslSocket::SslSocket(const QSslConfiguration &config, bool ignoreSelfSign
     connect(_socket.data(), &QSslSocket::encrypted,    this, &SocketInterface::connected);
     connect(_socket.data(), &QSslSocket::disconnected, this, &SocketInterface::disconnected);
     connect(_socket.data(),
-            static_cast<void (QSslSocket::*)(QAbstractSocket::SocketError)>(&QSslSocket::error),
+            static_cast<void (QSslSocket::*)(QAbstractSocket::SocketError)>(&QSslSocket::errorOccurred),
             this,
             static_cast<void (SocketInterface::*)(QAbstractSocket::SocketError)>(&SocketInterface::error));
     connect(_socket.data(),
