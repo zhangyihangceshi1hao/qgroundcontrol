@@ -1,4 +1,4 @@
-/****************************************************************************
+﻿/****************************************************************************
  *
  * (c) 2009-2020 QGROUNDCONTROL PROJECT <http://www.qgroundcontrol.org>
  *
@@ -370,14 +370,18 @@ void QGCCorePlugin::factValueGridCreateDefaultSettings(const QString& defaultSet
 QQmlApplicationEngine* QGCCorePlugin::createQmlApplicationEngine(QObject* parent)
 {
     QQmlApplicationEngine* qmlEngine = new QQmlApplicationEngine(parent);
+     //QQmlEngine中方法：  添加qml文件目录
     qmlEngine->addImportPath("qrc:/qml");
+    //注册了一个名为“joystickManager”的 QML上下文的全局可见属性， 能在QML中调用(QML调用C++的一种形式)
     qmlEngine->rootContext()->setContextProperty("joystickManager", qgcApp()->toolbox()->joystickManager());
+    //注册了一个名为“debugMessageModel”的 QML上下文的全局可见属性， 能在QML中调用(QML调用C++的一种形式)
     qmlEngine->rootContext()->setContextProperty("debugMessageModel", AppMessages::getModel());
     return qmlEngine;
 }
 
 void QGCCorePlugin::createRootWindow(QQmlApplicationEngine* qmlEngine)
 {
+     //加载url的QML根文件，立即创建了由本地文件urls定义的对象树。此为UI显示的根目录
     qmlEngine->load(QUrl(QStringLiteral("qrc:/qml/MainRootWindow.qml")));
 }
 

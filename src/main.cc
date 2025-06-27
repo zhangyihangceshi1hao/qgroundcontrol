@@ -1,4 +1,4 @@
-/****************************************************************************
+﻿/****************************************************************************
  *
  * (c) 2009-2020 QGROUNDCONTROL PROJECT <http://www.qgroundcontrol.org>
  *
@@ -419,6 +419,7 @@ int main(int argc, char *argv[])
 #ifdef __android__
         checkAndroidWritePermission();
 #endif
+        // QGC中UI的启动，从main.cc起
         if (!app->_initForNormalAppBoot()) {
             return -1;
         }
